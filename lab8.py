@@ -30,18 +30,6 @@ def euler_mod(x, y, h):
     y_half = y + 0.5*h * f(x, y)
     return y + h * f(x + h*0.5, y_half)
 
-
-def rungekutta_p2(x, y, h):
-    """Calculate next y point from
-    previous points x and y with Runga-Kutta second order method
-    :param x: float previous x point
-    :param y: float previous y point
-    :param h: float step
-    :return: float y value
-    """
-    return y + h*0.5 * (f(x, y) + f(x + h, y + h*f(x, y)))
-
-
 def rungekutta3(x, y, h):
     """Calculate next y point from
     previous points x and y with Runga-Kutta third order method
@@ -92,53 +80,25 @@ def get_last_y(a, b, n, method):
 a = 0
 b = 3
 
-# storage for errors
-error_euler = []
-error_euler_mod = []
-error_runge2 = []
-error_runge3 = []
-error_runge4 = []
-
 # Actual value of function in x = b
 I = 321.3685907710028004657
 
 # Calculate list of errors for my excellent plots
-for i in range(1, 21):
-    # get y values at the end of the segment
-    euler_y = get_last_y(a, b, 2**i, euler)
-    euler_mod_y = get_last_y(a, b, 2**i, euler_mod)
-    runge2_y = get_last_y(a, b, 2**i, rungekutta_p2)
-    runge3_y = get_last_y(a, b, 2**i, rungekutta3)
-    runge4_y = get_last_y(a, b, 2**i, rungekutta4)
+euler_y = [np.log2(np.abs(get_last_y(a, b, 2**i, euler) - I)) for i in range(1,21)]
+euler_mod_y = [np.log2(np.abs(get_last_y(a, b, 2**i, euler_mod) - I)) for i in range(1,21)]
+runge3_y = [np.log2(np.abs(get_last_y(a, b, 2**i, rungekutta3) - I)) for i in range(1,21)]
+runge4_y = [np.log2(np.abs(get_last_y(a, b, 2**i, rungekutta4) - I)) for i in range(1,21)]
 
-    # get errors for plots
-    error_euler.append(np.log2(np.abs(I - euler_y)))
-    error_euler_mod.append(np.log2(np.abs(I - euler_mod_y)))
-    error_runge2.append(np.log2(np.abs(I - runge2_y)))
-    error_runge3.append(np.log2(np.abs(I - runge3_y)))
-    error_runge4.append(np.log2(np.abs(I - runge4_y)))
+plt.xlabel("iterations")
+plt.ylabel("Log2(I* - I)")
 
-# Plots
+plt.plot(np.arange(0, 20), euler_y, color="#bdc3c7")
+plt.plot(np.arange(0, 20), euler_mod_y, color="lightblue")
+plt.plot(np.arange(0, 20), runge3_y, color="red")
+plt.plot(np.arange(0, 20), runge4_y, color="#16a085")
 
-# Euler
-plt.plot(np.arange(0, 20), error_euler, color="#bdc3c7")
-gray_patch = mp.Patch(color='#bdc3c7', label='Euler')
-
-# Euler with modification
-plt.plot(np.arange(0, 20), error_euler_mod, color="lightblue")
-blue_patch = mp.Patch(color='lightblue', label='Euler mod.')
-
-# Runge-Kutta 2 order
-plt.plot(np.arange(0, 20), error_runge2, color="pink")
-pink_patch = mp.Patch(color='pink', label='R-K 2.')
-
-# Runge-Kutta 3 order
-plt.plot(np.arange(0, 20), error_runge3, color="red")
-green_patch = mp.Patch(color='red', label='R-K 3.')
-
-# Runge-Kutta 4 order
-plt.plot(np.arange(0, 20), error_runge4, color="#16a085")
-mag_patch = mp.Patch(color='#16a085', label='R-K 4.')
-
-plt.legend(handles=[gray_patch, blue_patch, pink_patch, green_patch, mag_patch])
+plt.legend(handles=[mp.Patch(color='#bdc3c7', label='Euler'),
+                    mp.Patch(color='lightblue', label='Euler mod.'),
+                    mp.Patch(color='red', label='R-K 3.'),
+                    mp.Patch(color='#16a085', label='R-K 4.')])
 plt.show()
