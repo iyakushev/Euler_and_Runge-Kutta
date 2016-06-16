@@ -27,8 +27,7 @@ def euler_mod(x, y, h):
     :param h: float step point
     :return: float y value
     """
-    y_half = y + 0.5*h * f(x, y)
-    return y + h * f(x + h*0.5, y_half)
+    return y + h * 0.5 * (f(x, y) + f(x + h, y + h * f(x, y)))
 
 def rungekutta3(x, y, h):
     """Calculate next y point from
